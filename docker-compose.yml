@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: unitary-care-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: unitary_care
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d unitary_care"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: node:20-alpine
+    container_name: unitary-care-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    working_dir: /app
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/unitary_care
+      JWT_ACCESS_SECRET: super-secret-access-key
+      REFRESH_TOKEN_TTL: 30d
+      STORAGE_PROVIDER: local
+      UPLOAD_DIR: uploads
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app
+      - uploads_data:/app/uploads
+    command:
+      - sh
+      - -lc
+      - |
+        npm install &&
+        node server.js
+
+volumes:
+  postgres_data:
+  uploads_data:
