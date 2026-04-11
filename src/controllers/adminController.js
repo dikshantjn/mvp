@@ -2,7 +2,9 @@ const AdminService = require("../services/AdminService");
 const DocumentService = require("../services/DocumentService");
 const PaymentService = require("../services/PaymentService");
 const ProgressService = require("../services/ProgressService");
+const { runSeed } = require("../services/SeedService");
 const TicketService = require("../services/TicketService");
+const ApiError = require("../utils/apiError");
 const { sendSuccess } = require("../utils/responses");
 
 async function importBuyers(req, res) {
@@ -68,6 +70,22 @@ async function listProjects(req, res) {
   sendSuccess(res, data);
 }
 
+async function runDevSeed(req, res) {
+  const seedKey = req.headers["x-seed-key"];
+  const expectedSeedKey = process.env.SEED_KEY || process.env.SEED_SECRET || process.env.SEED_API_KEY;
+  const isProduction = process.env.NODE_ENV === "production";
+
+  if (isProduction && (!expectedSeedKey || seedKey !== expectedSeedKey)) {
+    throw new ApiError(403, "FORBIDDEN", "Valid x-seed-key header is required", {});
+  }
+
+  await runSeed();
+  res.json({
+    success: true,
+    message: "Seed completed"
+  });
+}
+
 module.exports = {
   createDocument,
   createPayment,
@@ -79,6 +97,7 @@ module.exports = {
   listPayments,
   listProjects,
   listTickets,
+  runDevSeed,
   updateTicket,
   updateUnit
 };
