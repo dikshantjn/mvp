@@ -43,14 +43,24 @@ function loadEnv() {
   return cachedConfig;
 }
 
-module.exports = new Proxy(
-  {},
-  {
-    get(_target, prop) {
-      const config = loadEnv();
-      return config[prop];
-    }
+module.exports = {
+  loadEnv,
+  get PORT() {
+    return loadEnv().PORT;
+  },
+  get DATABASE_URL() {
+    return loadEnv().DATABASE_URL;
+  },
+  get JWT_ACCESS_SECRET() {
+    return loadEnv().JWT_ACCESS_SECRET;
+  },
+  get REFRESH_TOKEN_TTL() {
+    return loadEnv().REFRESH_TOKEN_TTL;
+  },
+  get STORAGE_PROVIDER() {
+    return loadEnv().STORAGE_PROVIDER;
+  },
+  get UPLOAD_DIR() {
+    return loadEnv().UPLOAD_DIR;
   }
-);
-
-module.exports.loadEnv = loadEnv;
+};
