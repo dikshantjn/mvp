@@ -11,9 +11,9 @@ const adminValidators = require("../validators/adminValidators");
 
 const router = express.Router();
 
-router.use(authenticate, roleGuard("admin"));
-
 router.post("/admin/dev/seed", asyncHandler(adminController.runDevSeed));
+
+router.use(authenticate, roleGuard("admin"));
 router.post("/admin/imports/buyers", csvUpload.single("file"), asyncHandler(adminController.importBuyers));
 router.get("/admin/buyers", parsePagination, asyncHandler(adminController.listBuyers));
 router.get("/admin/buyers/:buyerId", asyncHandler(adminController.getBuyerDetail));
