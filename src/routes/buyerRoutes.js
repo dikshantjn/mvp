@@ -10,7 +10,7 @@ const buyerValidators = require("../validators/buyerValidators");
 
 const router = express.Router();
 
-router.use(authenticate, roleGuard("buyer"));
+router.use("/me", authenticate, roleGuard("buyer"));
 
 router.get("/me", asyncHandler(buyerController.getMe));
 router.get("/me/unit", asyncHandler(buyerController.getMyUnit));
