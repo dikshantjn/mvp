@@ -1,4 +1,4 @@
-import { env } from '../config/env';
+import { env } from '../config/clientEnv';
 import type { ApiResponse, RefreshResponse } from '../types/api';
 
 const JSON_HEADERS = {
